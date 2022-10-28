@@ -1,17 +1,15 @@
 class Cell{
     static cellsRevealed = 0
+    static colors = {1: "blue", 2: "green", 3: "yellow", 4: "#0800A1", 5:"#DB0066", 6:"#30B0B3", 7:"purple", 8:"grey"}
     constructor(xPos, yPos, canvas, grid){
         this.xPos = xPos;
         this.yPos = yPos;
         this.canvas = canvas;
         this.grid = grid;
-
-        // Squeare states: mines, marked, explored
+        // Square states: mines, marked, explored
         this.mine = false;
         this.marked = false;
         this.explored = false;
-        this.colors = {1: "blue", 2: "green", 3: "yellow", 4: "#0800A1", 5:"#DB0066", 6:"#30B0B3", 7:"purple", 8:"grey"}
-
         // Div creation and insertion in the DOM
         this.div = document.createElement("div");
         this.canvas.insertAdjacentElement("afterend", this.div);
@@ -55,19 +53,16 @@ class Cell{
                     this.div.style.backgroundColor = "#D9D9D9";
                     Cell.cellsRevealed += 1;
                     var tempCount = 0;
-
                     // For loops to explore the cells in the range -1/+1 of the cell
                     // in the x and y axis.
                     for(let y = -1; y < 2; y+=1){
                         for(let x = -1; x < 2; x+=1){
-                            // If clause to prenten the cell that invokes the function to be checked
+                            // If clause for preventing the cell that invokes the function to be checked
                             if(x !== 0 || y !== 0){
                                 var tempX = this.xPos+x;
                                 var tempY = this.yPos+y;
-
                                 // Clause to not explore cells outside the grid
                                 if((tempX >= 0 && tempY >= 0)&&(tempX < this.grid.width && tempY < this.grid.height)){
-                                    console.log(`x = ${x} and y = ${y}`)
                                     var temp = this.grid.cellRegister[`${tempX}, ${tempY}`];
                                     if(temp.getMine === true){
                                         tempCount += 1
@@ -78,11 +73,9 @@ class Cell{
                     }
                     if(tempCount > 0){
                         this.div.innerText = `${tempCount}`;
-                        this.div.style.color = this.colors[`${tempCount}`]
+                        this.div.style.color = Cell.colors[`${tempCount}`]
                     }
-                    console.log("this.grid.goal = ",this.grid.goal)               
-                    console.log(Cell.cellsRevealed)
-            }
+                }
             }    
         }
         this.checkWin()
@@ -196,9 +189,7 @@ class Grid{
         }
     }
 }
-
 window.onload = function init(){
-
     var canvas = document.querySelector("canvas");
     // var context = canvas.getContext("2d");
     var field = new Grid(8, 8, 10, canvas);
