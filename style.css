@@ -1,0 +1,17 @@
+/* canvas{
+  background-color: black;
+}   */
+div{
+    position: absolute;
+    margin: 0px;
+    border: thin;
+    border-style: double;
+    background-color: grey;
+    top: 0px;
+    height: 25px;
+    width: 25px;
+    
+    text-align: center;
+    font-weight: bold;
+    font-size: 22px;
+  }
