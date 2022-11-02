@@ -1,10 +1,9 @@
 class Cell{
     static cellsRevealed = 0
     static colors = {1: "blue", 2: "green", 3: "yellow", 4: "#0800A1", 5:"#DB0066", 6:"#30B0B3", 7:"purple", 8:"grey"}
-    constructor(xPos, yPos, canvas, grid){
+    constructor(xPos, yPos, grid){
         this.xPos = xPos;
         this.yPos = yPos;
-        this.canvas = canvas;
         this.grid = grid;
         // Square states: mines, marked, explored
         this.mine = false;
@@ -12,15 +11,8 @@ class Cell{
         this.explored = false;
         // Div creation and insertion in the DOM
         this.div = document.createElement("div");
-
-        // To consider: It seem that there is not need for a canvas element here.
-        // The following lines would do the same inserting the divs in the body of the page.
-        
-        //var body = document.querySelector("body");
-        //body.insertAdjacentElement("beforeend", this.div)
-
-
-        this.canvas.insertAdjacentElement("afterend", this.div);
+        var body = document.querySelector("body");
+        body.insertAdjacentElement("beforeend", this.div)
         this.div.style.left = `${this.xPos*27}px`
         this.div.style.top = `${this.yPos*27}px`
         this.div.addEventListener("mousedown", this.logButtons)
@@ -130,11 +122,10 @@ class Cell{
     }
 }
 class Grid{
-    constructor(width, height, numMines, canvas){
+    constructor(width, height, numMines){
         this.width = width;
         this.height = height;
         this.numMines = numMines;
-        this.canvas = canvas;
         this.cellRegister = new Object();
         this.squaresArray = [];
         this.minesArray = [];
@@ -185,7 +176,7 @@ class Grid{
         var counter = 0
         for(let y = 0; y < this.height; y++){
             for(let x = 0; x < this.width; x++){
-                this.cellRegister[`${x}, ${y}`] = new Cell(x, y, this.canvas, this.grid)
+                this.cellRegister[`${x}, ${y}`] = new Cell(x, y, this.grid)
                 if(counter === this.minesArray[0]){
                     this.cellRegister[`${x}, ${y}`].setMine = true;
                     counter +=1;
@@ -198,9 +189,7 @@ class Grid{
     }
 }
 window.onload = function init(){
-    var canvas = document.querySelector("canvas");
-    // var context = canvas.getContext("2d");
-    var field = new Grid(8, 8, 10, canvas);
+    var field = new Grid(8, 8, 10 );
     field.addGrid(field);
     field.seedMines();
     field.drawGrid();
