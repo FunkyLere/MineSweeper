@@ -1,14 +1,15 @@
 class Cell{
     static cellsRevealed = 0
     static colors = {1: "blue", 2: "green", 3: "yellow", 4: "#0800A1", 5:"#DB0066", 6:"#30B0B3", 7:"purple", 8:"grey"}
+    static cellsExplored = {}
     constructor(xPos, yPos, grid){
         this.xPos = xPos;
         this.yPos = yPos;
         this.grid = grid;
-        // Square states: mines, marked, explored
+        // Square states: mines, marked, (explored) replaced by mineCount
         this.mine = false;
         this.marked = false;
-        this.explored = false;
+        this.mineCount = false;
         // Div creation and insertion in the DOM
         this.div = document.createElement("div");
         var body = document.querySelector("body");
@@ -29,7 +30,6 @@ class Cell{
     // set setMinesFound(int){
     //     return this.minesFound = int;
     // }
-    
     logButtons = (e) =>{
         this.div.data = e.buttons
         if(this.div.data === 1){
@@ -48,11 +48,10 @@ class Cell{
                 this.div.style.backgroundColor = "red";
                 this.lose()
             }else{
-                if(this.explored !== true){
-                    this.explored = true;
+                if(this.mineCount === false){
                     this.div.style.backgroundColor = "#D9D9D9";
                     Cell.cellsRevealed += 1;
-                    var tempCount = 0;
+                    this.mineCount = 0;
                     // For loops to explore the cells in the range -1/+1 of the cell
                     // in the x and y axis.
                     for(let y = -1; y < 2; y+=1){
@@ -65,15 +64,15 @@ class Cell{
                                 if((tempX >= 0 && tempY >= 0)&&(tempX < this.grid.width && tempY < this.grid.height)){
                                     var temp = this.grid.cellRegister[`${tempX}, ${tempY}`];
                                     if(temp.getMine === true){
-                                        tempCount += 1
+                                        this.mineCount += 1
                                     }
                                 }
                             }
                         }
                     }
-                    if(tempCount > 0){
-                        this.div.innerText = `${tempCount}`;
-                        this.div.style.color = Cell.colors[`${tempCount}`]
+                    if(this.mineCount > 0){
+                        this.div.innerText = `${this.mineCount}`;
+                        this.div.style.color = Cell.colors[`${this.mineCount}`]
                     }
                 }
             }    
@@ -81,23 +80,32 @@ class Cell{
         this.checkWin()
     }
     mark = () =>{
-        if(this.marked === false && this.explored === false){
+        if(this.marked === false && this.mineCount === false){
             this.div.style.backgroundColor = "orange";
             this.marked = true;
-        }else if(this.explored === false){
+        }else if(this.mineCount === false){
             this.div.style.backgroundColor = "grey";
             this.marked = false;
         }  
     }
     exploreAround = () =>{
+        // Function for exploring all the cells with no mines around surronding this cell.
         for(let y = -1; y < 2; y+=1){
+            // For loops to explore the 8 adjacents cells.
             for(let x = -1; x < 2; x+=1){
                 var tempX = this.xPos+x;
                 var tempY = this.yPos+y;
-                // If clause to prevent from exploring the cell where the method is called
-                // and outside the grid
-                if((x !== 0 || y !== 0)&&(tempX >= 0 && tempY >= 0)&&(tempX < this.grid.width && tempY < this.grid.height)){
+                // If clause to prevent from exploring the cell where the method has been called and outside the grid.
+                if((x !== 0 || y !== 0)&&(tempX >= 0 && tempY >= 0) && 
+                (tempX < this.grid.width && tempY < this.grid.height)){
                     this.grid.cellRegister[`${tempX}, ${tempY}`].explore()
+                    // If clause to prevent the recursive call to be exploring the same cells infinitely
+                    // by adding the cells explored to a class variable and preventing the function to reexploring them.
+                    if(this.grid.cellRegister[`${tempX}, ${tempY}`].mineCount === 0 && 
+                    !(Cell.cellsExplored[`${tempX}, ${tempY}`]===true)){
+                        Cell.cellsExplored[`${tempX}, ${tempY}`] = true;
+                        this.grid.cellRegister[`${tempX}, ${tempY}`].exploreAround()
+                    }
                 }
             }
         }
@@ -189,7 +197,7 @@ class Grid{
     }
 }
 window.onload = function init(){
-    var field = new Grid(8, 8, 10 );
+    var field = new Grid(14, 10, 5);
     field.addGrid(field);
     field.seedMines();
     field.drawGrid();

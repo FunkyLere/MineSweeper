@@ -1,13 +1,9 @@
-/* canvas{
-  position: absolute;
-}   */
 div{
     position: absolute;
     margin-top: 200px;
     border: thin;
     border-style: double;
     background-color: grey;
-    top: 0px;
     height: 25px;
     width: 25px;
     
