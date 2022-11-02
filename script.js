@@ -12,6 +12,14 @@ class Cell{
         this.explored = false;
         // Div creation and insertion in the DOM
         this.div = document.createElement("div");
+
+        // To consider: It seem that there is not need for a canvas element here.
+        // The following lines would do the same inserting the divs in the body of the page.
+        
+        //var body = document.querySelector("body");
+        //body.insertAdjacentElement("beforeend", this.div)
+
+
         this.canvas.insertAdjacentElement("afterend", this.div);
         this.div.style.left = `${this.xPos*27}px`
         this.div.style.top = `${this.yPos*27}px`

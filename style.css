@@ -1,9 +1,9 @@
 /* canvas{
-  background-color: black;
+  position: absolute;
 }   */
 div{
     position: absolute;
-    margin: 0px;
+    margin-top: 200px;
     border: thin;
     border-style: double;
     background-color: grey;
