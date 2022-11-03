@@ -12,7 +12,7 @@ class Cell{
         this.mineCount = false;
         // Div creation and insertion in the DOM
         this.div = document.createElement("div");
-        var body = document.querySelector("body");
+        const body = document.querySelector("body");
         body.insertAdjacentElement("beforeend", this.div)
         this.div.style.left = `${this.xPos*27}px`
         this.div.style.top = `${this.yPos*27}px`
@@ -196,9 +196,58 @@ class Grid{
         }
     }
 }
-window.onload = function init(){
-    var field = new Grid(14, 10, 5);
+createButtons = () =>{
+
+    const body = document.querySelector("body");
+    var header = document.createElement("header");
+    body.insertAdjacentElement("afterbegin", header)
+
+    var easy = document.createElement("button");
+    easy.className = "easyButton";
+    easy.innerText = "Easy";
+    easy.addEventListener("click", startEasy);
+    header.insertAdjacentElement("beforeend", easy);
+
+    var medium = document.createElement("button");
+    medium.className = "mediumButton";
+    medium.innerText = "Medium";
+    medium.addEventListener("click", startMedium);
+    header.insertAdjacentElement("beforeend", medium);
+
+    var hard = document.createElement("button");
+    hard.className = "hardButton";
+    hard.innerText = "Hard";
+    hard.addEventListener("click", startHard);
+    header.insertAdjacentElement("beforeend", hard);
+}
+startGame = (width, height, mines) =>{
+    var field = new Grid(width, height, mines);
     field.addGrid(field);
     field.seedMines();
     field.drawGrid();
+}
+resetGame = () =>{
+    // Remove all the div and create buttons again
+    document.body.innerHTML = ""
+    createButtons()
+    // Reset Cell.cellRevealed and Cell.cellExplored.
+    Cell.cellsExplored = {}
+    Cell.cellsRevealed = 0
+}
+startEasy = () =>{
+    resetGame();
+    startGame(8, 8, 8);
+}
+startMedium = () =>{
+    resetGame();
+    startGame(14, 10, 26);
+}
+startHard = () =>{
+    resetGame();
+    startGame(18, 12, 48);
+}
+window.onload = function init(){
+
+createButtons()
+
 }
