@@ -166,9 +166,6 @@ class Grid{
         // First we create an array with a number corresponding with every square
         for(let i = 0; i < this.height*this.width; i++){
             this.squaresArray.push(i)
-            // temp = this.getSquaresArray;
-            // temp.push(i);
-            // this.setSquaresArray = temp;
         }
         // We select as many squares as mines are from the squares array
         // and we remove them from the squares array.
@@ -182,6 +179,7 @@ class Grid{
     }
     drawGrid = ()=> {
         var counter = 0
+        // For loop to assining mines to the corresponding cells.
         for(let y = 0; y < this.height; y++){
             for(let x = 0; x < this.width; x++){
                 this.cellRegister[`${x}, ${y}`] = new Cell(x, y, this.grid)
@@ -246,6 +244,7 @@ startHard = () =>{
     resetGame();
     startGame(18, 12, 48);
 }
+
 window.onload = function init(){
 
 createButtons()
