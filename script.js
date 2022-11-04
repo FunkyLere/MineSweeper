@@ -12,6 +12,7 @@ class Cell{
         this.mineCount = false;
         // Div creation and insertion in the DOM
         this.div = document.createElement("div");
+        this.div.className = "square"
         const body = document.querySelector("body");
         body.insertAdjacentElement("beforeend", this.div)
         this.div.style.left = `${this.xPos*27}px`
@@ -30,18 +31,20 @@ class Cell{
     // set setMinesFound(int){
     //     return this.minesFound = int;
     // }
-    logButtons = (e) =>{
-        this.div.data = e.buttons
-        if(this.div.data === 1){
-            this.explore();
-        }
-        else if(this.div.data === 2){ 
-            this.mark();
-        }
-        else if(this.div.data === 3){
-            this.exploreAround()
-        }
-    }
+
+    
+    // logButtons = (e) =>{
+    //     this.div.data = e.buttons
+    //     if(this.div.data === 1){
+    //         this.explore();
+    //     }
+    //     else if(this.div.data === 2){ 
+    //         this.mark();
+    //     }
+    //     else if(this.div.data === 3){
+    //         this.exploreAround()
+    //     }
+    // }
     explore = () =>{
         if(this.marked === false){
             if(this.getMine === true){
@@ -166,9 +169,6 @@ class Grid{
         // First we create an array with a number corresponding with every square
         for(let i = 0; i < this.height*this.width; i++){
             this.squaresArray.push(i)
-            // temp = this.getSquaresArray;
-            // temp.push(i);
-            // this.setSquaresArray = temp;
         }
         // We select as many squares as mines are from the squares array
         // and we remove them from the squares array.
@@ -182,6 +182,7 @@ class Grid{
     }
     drawGrid = ()=> {
         var counter = 0
+        // For loop to assining mines to the corresponding cells.
         for(let y = 0; y < this.height; y++){
             for(let x = 0; x < this.width; x++){
                 this.cellRegister[`${x}, ${y}`] = new Cell(x, y, this.grid)
@@ -220,6 +221,26 @@ createButtons = () =>{
     hard.addEventListener("click", startHard);
     header.insertAdjacentElement("beforeend", hard);
 }
+logClick = (e) =>{
+    // this.div.data = e.buttons
+    const element = e.target
+    console.log(`element = ${element}`)
+    
+    console.log(`e.target.className = ${element.className}`)
+    console.log(`e.buttons = ${e.buttons}`)
+    if(e.buttons === 0 && element.className ==="square"){
+        console.log("I'm at line 228")
+        element.explore();
+    }
+    else if(e.buttons === 1 && e.target.className ==="square"){ 
+        this.mark();
+        console.log("I'm at line 233")
+    }
+    else if(e.buttons === 2 && e.target.className ==="square"){
+        this.exploreAround()
+        console.log("I'm at line 237")
+    }
+}
 startGame = (width, height, mines) =>{
     var field = new Grid(width, height, mines);
     field.addGrid(field);
@@ -246,8 +267,12 @@ startHard = () =>{
     resetGame();
     startGame(18, 12, 48);
 }
+
 window.onload = function init(){
 
 createButtons()
+document.addEventListener("click", event => logClick(event))
+//     const 
+// })
 
 }
