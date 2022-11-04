@@ -221,26 +221,40 @@ createButtons = () =>{
     hard.addEventListener("click", startHard);
     header.insertAdjacentElement("beforeend", hard);
 }
-logClick = (e) =>{
-    // this.div.data = e.buttons
-    const element = e.target
-    console.log(`element = ${element}`)
+// logClick = (e) =>{
+//     const element = e.target
+//     console.log(`element = ${element}`)
     
-    console.log(`e.target.className = ${element.className}`)
-    console.log(`e.buttons = ${e.buttons}`)
-    if(e.buttons === 0 && element.className ==="square"){
-        console.log("I'm at line 228")
-        element.explore();
+//     console.log(`e.target.className = ${element.className}`)
+//     console.log(`e.buttons = ${e.buttons}`)
+//     if(e.buttons === 0 && element.className ==="square"){
+//         console.log("I'm at line 228")
+//         element.explore();
+//     }
+//     else if(e.buttons === 1 && e.target.className ==="square"){ 
+//         this.mark();
+//         console.log("I'm at line 233")
+//     }
+//     else if(e.buttons === 2 && e.target.className ==="square"){
+//         this.exploreAround()
+//         console.log("I'm at line 237")
+//     }
+// }
+
+logClick = (e) =>{
+        
+        // this.div.data = e.buttons
+        console.log(e.buttons)
+        // if(this.div.data === 1){
+        //     this.explore();
+        // }
+        // else if(this.div.data === 2){ 
+        //     this.mark();
+        // }
+        // else if(this.div.data === 3){
+        //     this.exploreAround()
+        // }
     }
-    else if(e.buttons === 1 && e.target.className ==="square"){ 
-        this.mark();
-        console.log("I'm at line 233")
-    }
-    else if(e.buttons === 2 && e.target.className ==="square"){
-        this.exploreAround()
-        console.log("I'm at line 237")
-    }
-}
 startGame = (width, height, mines) =>{
     var field = new Grid(width, height, mines);
     field.addGrid(field);
@@ -271,7 +285,7 @@ startHard = () =>{
 window.onload = function init(){
 
 createButtons()
-document.addEventListener("click", event => logClick(event))
+document.addEventListener("mousedown", event => logClick(event))
 //     const 
 // })
 
