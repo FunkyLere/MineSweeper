@@ -31,14 +31,14 @@ class Cell{
     //     return this.minesFound = int;
     // }
     logButtons = (e) =>{
-        this.div.data = e.buttons
-        if(this.div.data === 1){
+        const click = e.buttons
+        if(click === 1){
             this.explore();
         }
-        else if(this.div.data === 2){ 
+        else if(click === 2){ 
             this.mark();
         }
-        else if(this.div.data === 3){
+        else if(click === 3){
             this.exploreAround()
         }
     }
