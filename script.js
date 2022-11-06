@@ -12,7 +12,7 @@ class Cell{
         this.mineCount = false;
         // Div creation and insertion in the DOM
         this.div = document.createElement("div");
-        this.div.className = "square"
+        this.div.className = "square";
         const body = document.querySelector("body");
         body.insertAdjacentElement("beforeend", this.div)
         this.div.style.left = `${this.xPos*27}px`
