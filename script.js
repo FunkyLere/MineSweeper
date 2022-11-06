@@ -196,9 +196,17 @@ class Grid{
 }
 createButtons = () =>{
 
+    // Considerar crear clase button - PIWI TIP
+
     const body = document.querySelector("body");
     var header = document.createElement("header");
-    body.insertAdjacentElement("afterbegin", header)
+    body.insertAdjacentElement("afterbegin", header);
+
+    // for(i = 0; i > Object.keys(obj).length; i++){
+    //     var `${Object.keys}` = document.createElement("button");
+    //     `${Object.keys}`.className = "easyButton";
+    //     `${Object.keys}`.innerText = "Easy";
+    // }
 
     var easy = document.createElement("button");
     easy.className = "easyButton";
@@ -226,11 +234,11 @@ startGame = (width, height, mines) =>{
 }
 resetGame = () =>{
     // Remove all the div and create buttons again
-    document.body.innerHTML = ""
-    createButtons()
+    document.body.innerHTML = "";
+    createButtons();
     // Reset Cell.cellRevealed and Cell.cellExplored.
-    Cell.cellsExplored = {}
-    Cell.cellsRevealed = 0
+    Cell.cellsExplored = {};
+    Cell.cellsRevealed = 0;
 }
 startEasy = () =>{
     resetGame();
@@ -247,6 +255,6 @@ startHard = () =>{
 
 window.onload = function init(){
 
-createButtons()
+createButtons();
 
 }
