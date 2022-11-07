@@ -1,7 +1,8 @@
 class Cell{
     static cellsRevealed = 0
     static colors = {1: "blue", 2: "green", 3: "yellow", 4: "#0800A1", 5:"#DB0066", 6:"#30B0B3", 7:"purple", 8:"grey"}
-    static cellsExplored = {}
+    static cellsExplored = {};
+    static cells = {};
     constructor(xPos, yPos, grid){
         this.xPos = xPos;
         this.yPos = yPos;
@@ -17,10 +18,9 @@ class Cell{
         body.insertAdjacentElement("beforeend", this.div)
         this.div.style.left = `${this.xPos*27}px`
         this.div.style.top = `${this.yPos*27}px`
-        // Data element for making target work - unsuccesfully at the moment.
         this.div.dataset.cellName = `${this.xPos} ,${this.yPos}`
-        this.div.dataset.grid = this.grid
-        // this.div.addEventListener("mousedown", this.logButtons)
+        Cell.cells[`${this.xPos} ,${this.yPos}`] = this;
+        console.log(Cell.cells);
     }
     get getMine(){
         return this.mine;
@@ -201,7 +201,8 @@ class Grid{
     }
 }
 createButtons = () =>{
-
+    // Check if it's possible remove the buttons eventListener
+    // and use the document.addEventListener
     const body = document.querySelector("body");
     var header = document.createElement("header");
     body.insertAdjacentElement("afterbegin", header)
@@ -233,19 +234,22 @@ logClick = (e) =>{
     console.log(`element = ${element}`) 
     console.log(`element data set = ${element.dataset.cellName}`)
     console.log(`grid = ${element.dataset.grid}`)
-    console.log(`${element.dataset.grid}.cellRegister[${element.dataset.cellName}]`.getMine())
+    console.log(Cell.cells[`${element.dataset.cellName}`])
+    
+    // console.log(`${element.dataset.grid}.cellRegister[${element.dataset.cellName}]`.getMine())
     
 //     console.log(`e.target.className = ${element.className}`)
 //     console.log(`e.buttons = ${e.buttons}`)
-//     if(e.buttons === 0 && element.className ==="square"){
-//         ${element.dataset.cellName}.element.explore();
-//     }
-//     else if(e.buttons === 1 && e.target.className ==="square"){ 
-//         this.mark(); 
-//     }
-//     else if(e.buttons === 2 && e.target.className ==="square"){
-//         this.exploreAround()   
-//     }
+    if(e.buttons === 1 && element.className ==="square"){
+        // Aquí hay que pasar la entrada del diccionario cell
+        Cell.cells[`${element.dataset.cellName}`].explore();
+    }
+    else if(e.buttons === 2 && e.target.className ==="square"){ 
+        Cell.cells[`${element.dataset.cellName}`].mark(); 
+    }
+    else if(e.buttons === 3 && e.target.className ==="square"){
+        Cell.cells[`${element.dataset.cellName}`].exploreAround()   
+    }
 // }
 
     }
