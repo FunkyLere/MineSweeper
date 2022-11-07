@@ -1,22 +1,23 @@
 class Cell{
-    static cellsRevealed = 0
+    static cellsRevealed = 0;
     static colors = {1: "blue", 2: "green", 3: "yellow", 4: "#0800A1", 5:"#DB0066", 6:"#30B0B3", 7:"purple", 8:"grey"}
-    static cellsExplored = {}
-    constructor(xPos, yPos, grid){
+    static cellsExplored = {};
+    constructor(xPos, yPos, grid, container){
         this.xPos = xPos;
         this.yPos = yPos;
         this.grid = grid;
+        console.log(`${container}`)
+        this.container = container;
         // Square states: mines, marked, (explored) replaced by mineCount
         this.mine = false;
         this.marked = false;
         this.mineCount = false;
         // Div creation and insertion in the DOM
         this.div = document.createElement("div");
-        const body = document.querySelector("body");
-        body.insertAdjacentElement("beforeend", this.div)
-        this.div.style.left = `${this.xPos*27}px`
-        this.div.style.top = `${this.yPos*27}px`
-        this.div.addEventListener("mousedown", this.logButtons)
+        this.container.insertAdjacentElement("beforeend", this.div);
+        this.div.style.left = `${this.xPos*27}px`;
+        this.div.style.top = `${this.yPos*27}px`;
+        this.div.addEventListener("mousedown", this.logButtons);
     }
     get getMine(){
         return this.mine;
@@ -24,12 +25,6 @@ class Cell{
     set setMine(boolean){
         this.mine = boolean;
     }
-    // get getMinesFound(){
-    //     return this.minesFound;
-    // }
-    // set setMinesFound(int){
-    //     return this.minesFound = int;
-    // }
     logButtons = (e) =>{
         const click = e.buttons
         if(click === 1){
@@ -130,10 +125,11 @@ class Cell{
     }
 }
 class Grid{
-    constructor(width, height, numMines){
+    constructor(width, height, numMines, container){
         this.width = width;
         this.height = height;
         this.numMines = numMines;
+        this.container = container
         this.cellRegister = new Object();
         this.squaresArray = [];
         this.minesArray = [];
@@ -182,7 +178,7 @@ class Grid{
         // For loop to assining mines to the corresponding cells.
         for(let y = 0; y < this.height; y++){
             for(let x = 0; x < this.width; x++){
-                this.cellRegister[`${x}, ${y}`] = new Cell(x, y, this.grid)
+                this.cellRegister[`${x}, ${y}`] = new Cell(x, y, this.grid, this.container)
                 if(counter === this.minesArray[0]){
                     this.cellRegister[`${x}, ${y}`].setMine = true;
                     counter +=1;
@@ -194,67 +190,41 @@ class Grid{
         }
     }
 }
-createButtons = () =>{
-
-    // Considerar crear clase button - PIWI TIP
-
-    const body = document.querySelector("body");
-    var header = document.createElement("header");
-    body.insertAdjacentElement("afterbegin", header);
-
-    // for(i = 0; i > Object.keys(obj).length; i++){
-    //     var `${Object.keys}` = document.createElement("button");
-    //     `${Object.keys}`.className = "easyButton";
-    //     `${Object.keys}`.innerText = "Easy";
-    // }
-
-    var easy = document.createElement("button");
-    easy.className = "easyButton";
-    easy.innerText = "Easy";
-    easy.addEventListener("click", startEasy);
-    header.insertAdjacentElement("beforeend", easy);
-
-    var medium = document.createElement("button");
-    medium.className = "mediumButton";
-    medium.innerText = "Medium";
-    medium.addEventListener("click", startMedium);
-    header.insertAdjacentElement("beforeend", medium);
-
-    var hard = document.createElement("button");
-    hard.className = "hardButton";
-    hard.innerText = "Hard";
-    hard.addEventListener("click", startHard);
-    header.insertAdjacentElement("beforeend", hard);
+class StartButton{
+    constructor(name, width, height, mines, container){
+        this.name = name;
+        this.width = width;
+        this.height = height;
+        this.mines = mines;
+        this.container = container
+        this.button = document.createElement("button");
+        this.button.innerText = name.charAt(0).toUpperCase() + name.slice(1);
+        this.button.onclick = () =>{
+            resetGame(StartButton.list);
+            newGame(this.width, this.height, this.mines, this.container);
+        }
+        const header = document.querySelector("header");
+        header.insertAdjacentElement("beforeend", this.button);
+    }
 }
-startGame = (width, height, mines) =>{
-    var field = new Grid(width, height, mines);
+function newGame(width, height, mines, container){
+    var field = new Grid(width, height, mines, container);
     field.addGrid(field);
     field.seedMines();
     field.drawGrid();
 }
-resetGame = () =>{
+function resetGame(){
     // Remove all the div and create buttons again
-    document.body.innerHTML = "";
-    createButtons();
+    document.querySelector("#container").innerHTML = "";
     // Reset Cell.cellRevealed and Cell.cellExplored.
     Cell.cellsExplored = {};
     Cell.cellsRevealed = 0;
 }
-startEasy = () =>{
-    resetGame();
-    startGame(8, 8, 8);
-}
-startMedium = () =>{
-    resetGame();
-    startGame(14, 10, 26);
-}
-startHard = () =>{
-    resetGame();
-    startGame(18, 12, 48);
-}
-
 window.onload = function init(){
 
-createButtons();
+    const container = document.querySelector("#container")
+    var easy = new StartButton("easy", 8, 8, 8, container);
+    var medium = new StartButton("medium", 14, 10, 26, container);
+    var hard = new StartButton("hard", 18, 12, 48, container);
 
 }
