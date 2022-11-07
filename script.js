@@ -17,7 +17,10 @@ class Cell{
         body.insertAdjacentElement("beforeend", this.div)
         this.div.style.left = `${this.xPos*27}px`
         this.div.style.top = `${this.yPos*27}px`
-        this.div.addEventListener("mousedown", this.logButtons)
+        // Data element for making target work - unsuccesfully at the moment.
+        this.div.dataset.cellName = `${this.xPos} ,${this.yPos}`
+        this.div.dataset.grid = this.grid
+        // this.div.addEventListener("mousedown", this.logButtons)
     }
     get getMine(){
         return this.mine;
@@ -221,39 +224,30 @@ createButtons = () =>{
     hard.addEventListener("click", startHard);
     header.insertAdjacentElement("beforeend", hard);
 }
-// logClick = (e) =>{
-//     const element = e.target
-//     console.log(`element = ${element}`)
+logClick = (e) =>{
+    // First try to make target work
+    // Not working at the moment
+    // Can't pass the grid name to the dataset to be later retrieved and use
+    // in accesing to the cellRegister
+    const element = e.target
+    console.log(`element = ${element}`) 
+    console.log(`element data set = ${element.dataset.cellName}`)
+    console.log(`grid = ${element.dataset.grid}`)
+    console.log(`${element.dataset.grid}.cellRegister[${element.dataset.cellName}]`.getMine())
     
 //     console.log(`e.target.className = ${element.className}`)
 //     console.log(`e.buttons = ${e.buttons}`)
 //     if(e.buttons === 0 && element.className ==="square"){
-//         console.log("I'm at line 228")
-//         element.explore();
+//         ${element.dataset.cellName}.element.explore();
 //     }
 //     else if(e.buttons === 1 && e.target.className ==="square"){ 
-//         this.mark();
-//         console.log("I'm at line 233")
+//         this.mark(); 
 //     }
 //     else if(e.buttons === 2 && e.target.className ==="square"){
-//         this.exploreAround()
-//         console.log("I'm at line 237")
+//         this.exploreAround()   
 //     }
 // }
 
-logClick = (e) =>{
-        
-        // this.div.data = e.buttons
-        console.log(e.buttons)
-        // if(this.div.data === 1){
-        //     this.explore();
-        // }
-        // else if(this.div.data === 2){ 
-        //     this.mark();
-        // }
-        // else if(this.div.data === 3){
-        //     this.exploreAround()
-        // }
     }
 startGame = (width, height, mines) =>{
     var field = new Grid(width, height, mines);
