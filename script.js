@@ -1,12 +1,11 @@
 class Cell{
     static cellsRevealed = 0;
-    static colors = {1: "blue", 2: "green", 3: "yellow", 4: "#0800A1", 5:"#DB0066", 6:"#30B0B3", 7:"purple", 8:"grey"}
+    static colors = {1: "blue", 2: "green", 3: "yellow", 4: "#0800A1", 5:"#DB0066", 6:"#30B0B3", 7:"purple", 8:"grey"};
     static cellsExplored = {};
     constructor(xPos, yPos, grid, container){
         this.xPos = xPos;
         this.yPos = yPos;
         this.grid = grid;
-        console.log(`${container}`)
         this.container = container;
         // Square states: mines, marked, (explored) replaced by mineCount
         this.mine = false;
@@ -26,7 +25,7 @@ class Cell{
         this.mine = boolean;
     }
     logButtons = (e) =>{
-        const click = e.buttons
+        const click = e.buttons;
         if(click === 1){
             this.explore();
         }
@@ -34,14 +33,14 @@ class Cell{
             this.mark();
         }
         else if(click === 3){
-            this.exploreAround()
+            this.exploreAround();
         }
     }
     explore = () =>{
         if(this.marked === false){
             if(this.getMine === true){
                 this.div.style.backgroundColor = "red";
-                this.lose()
+                this.lose();
             }else{
                 if(this.mineCount === false){
                     this.div.style.backgroundColor = "#D9D9D9";
@@ -59,7 +58,7 @@ class Cell{
                                 if((tempX >= 0 && tempY >= 0)&&(tempX < this.grid.width && tempY < this.grid.height)){
                                     var temp = this.grid.cellRegister[`${tempX}, ${tempY}`];
                                     if(temp.getMine === true){
-                                        this.mineCount += 1
+                                        this.mineCount += 1;
                                     }
                                 }
                             }
@@ -67,7 +66,7 @@ class Cell{
                     }
                     if(this.mineCount > 0){
                         this.div.innerText = `${this.mineCount}`;
-                        this.div.style.color = Cell.colors[`${this.mineCount}`]
+                        this.div.style.color = Cell.colors[`${this.mineCount}`];
                     }
                 }
             }    
@@ -93,13 +92,13 @@ class Cell{
                 // If clause to prevent from exploring the cell where the method has been called and outside the grid.
                 if((x !== 0 || y !== 0)&&(tempX >= 0 && tempY >= 0) && 
                 (tempX < this.grid.width && tempY < this.grid.height)){
-                    this.grid.cellRegister[`${tempX}, ${tempY}`].explore()
+                    this.grid.cellRegister[`${tempX}, ${tempY}`].explore();
                     // If clause to prevent the recursive call to be exploring the same cells infinitely
                     // by adding the cells explored to a class variable and preventing the function to reexploring them.
                     if(this.grid.cellRegister[`${tempX}, ${tempY}`].mineCount === 0 && 
                     !(Cell.cellsExplored[`${tempX}, ${tempY}`]===true)){
                         Cell.cellsExplored[`${tempX}, ${tempY}`] = true;
-                        this.grid.cellRegister[`${tempX}, ${tempY}`].exploreAround()
+                        this.grid.cellRegister[`${tempX}, ${tempY}`].exploreAround();
                     }
                 }
             }
@@ -108,7 +107,7 @@ class Cell{
     checkWin = () =>{
         if(Cell.cellsRevealed === this.grid.goal){
             // logic gor ending the game winning
-            alert("The field is clear, you won!")
+            alert("The field is clear, you won!");
         }
     }
     lose = () =>{
@@ -121,7 +120,7 @@ class Cell{
                 }
             }
         }
-        // alert("You lost")
+        // alert("You lost");
     }
 }
 class Grid{
@@ -129,11 +128,11 @@ class Grid{
         this.width = width;
         this.height = height;
         this.numMines = numMines;
-        this.container = container
+        this.container = container;
         this.cellRegister = new Object();
         this.squaresArray = [];
         this.minesArray = [];
-        this.goal = this.width * this.height - this.numMines
+        this.goal = this.width * this.height - this.numMines;
     }
     get getNumMines(){
         return this.numMines;
@@ -151,7 +150,7 @@ class Grid{
         this.minesArray = array;
     }
     addGrid = (grid) => {
-        this.grid = grid
+        this.grid = grid;
     }
     // Function necesary for sorting numerics arrays
     compareNumbers = (a,b) =>{
@@ -167,14 +166,14 @@ class Grid{
         // and we remove them from the squares array.
         for(let i = 0; i < this.getNumMines; ++i){
             var selected = Math.floor(Math.random()*this.squaresArray.length);
-            var temp = this.squaresArray.splice(selected,1)
+            var temp = this.squaresArray.splice(selected,1);
             // We add them to the minesArray
             this.minesArray.push(temp.pop());            
         }
-        this.minesArray.sort(this.compareNumbers)
+        this.minesArray.sort(this.compareNumbers);
     }
     drawGrid = ()=> {
-        var counter = 0
+        var counter = 0;
         // For loop to assining mines to the corresponding cells.
         for(let y = 0; y < this.height; y++){
             for(let x = 0; x < this.width; x++){
@@ -196,7 +195,7 @@ class StartButton{
         this.width = width;
         this.height = height;
         this.mines = mines;
-        this.container = container
+        this.container = container;
         this.button = document.createElement("button");
         this.button.innerText = name.charAt(0).toUpperCase() + name.slice(1);
         this.button.onclick = () =>{
@@ -222,7 +221,7 @@ function resetGame(){
 }
 window.onload = function init(){
 
-    const container = document.querySelector("#container")
+    const container = document.querySelector("#container");
     var easy = new StartButton("easy", 8, 8, 8, container);
     var medium = new StartButton("medium", 14, 10, 26, container);
     var hard = new StartButton("hard", 18, 12, 48, container);
