@@ -1,8 +1,10 @@
 class Cell{
+    // Variable that given some coordinates in the grid points
+    // to the cell instance. Fundamental to use target()
+    static cellRegister = {};
     static cellsRevealed = 0
     static colors = {1: "blue", 2: "green", 3: "yellow", 4: "#0800A1", 5:"#DB0066", 6:"#30B0B3", 7:"purple", 8:"grey"}
     static cellsExplored = {};
-    static cells = {};
     constructor(xPos, yPos, grid){
         this.xPos = xPos;
         this.yPos = yPos;
@@ -11,6 +13,7 @@ class Cell{
         this.mine = false;
         this.marked = false;
         this.mineCount = false;
+        this.mineChecker = 0;
         // Div creation and insertion in the DOM
         this.div = document.createElement("div");
         this.div.className = "square";
@@ -19,8 +22,8 @@ class Cell{
         this.div.style.left = `${this.xPos*27}px`
         this.div.style.top = `${this.yPos*27}px`
         this.div.dataset.cellName = `${this.xPos} ,${this.yPos}`
-        Cell.cells[`${this.xPos} ,${this.yPos}`] = this;
-        console.log(Cell.cells);
+        //Add the instance of cell to the cells object 
+        Cell.cellRegister[`${this.xPos} ,${this.yPos}`] = this;
     }
     get getMine(){
         return this.mine;
@@ -28,26 +31,6 @@ class Cell{
     set setMine(boolean){
         this.mine = boolean;
     }
-    // get getMinesFound(){
-    //     return this.minesFound;
-    // }
-    // set setMinesFound(int){
-    //     return this.minesFound = int;
-    // }
-
-    
-    // logButtons = (e) =>{
-    //     this.div.data = e.buttons
-    //     if(this.div.data === 1){
-    //         this.explore();
-    //     }
-    //     else if(this.div.data === 2){ 
-    //         this.mark();
-    //     }
-    //     else if(this.div.data === 3){
-    //         this.exploreAround()
-    //     }
-    // }
     explore = () =>{
         if(this.marked === false){
             if(this.getMine === true){
@@ -68,7 +51,7 @@ class Cell{
                                 var tempY = this.yPos+y;
                                 // Clause to not explore cells outside the grid
                                 if((tempX >= 0 && tempY >= 0)&&(tempX < this.grid.width && tempY < this.grid.height)){
-                                    var temp = this.grid.cellRegister[`${tempX}, ${tempY}`];
+                                    var temp = this.grid.cellReg[`${tempX}, ${tempY}`];
                                     if(temp.getMine === true){
                                         this.mineCount += 1
                                     }
@@ -79,6 +62,8 @@ class Cell{
                     if(this.mineCount > 0){
                         this.div.innerText = `${this.mineCount}`;
                         this.div.style.color = Cell.colors[`${this.mineCount}`]
+                    }else{
+                        this.exploreAround()
                     }
                 }
             }    
@@ -95,27 +80,51 @@ class Cell{
         }  
     }
     exploreAround = () =>{
-        // Function for exploring all the cells with no mines around surronding this cell.
-        for(let y = -1; y < 2; y+=1){
-            // For loops to explore the 8 adjacents cells.
-            for(let x = -1; x < 2; x+=1){
-                var tempX = this.xPos+x;
-                var tempY = this.yPos+y;
-                // If clause to prevent from exploring the cell where the method has been called and outside the grid.
-                if((x !== 0 || y !== 0)&&(tempX >= 0 && tempY >= 0) && 
-                (tempX < this.grid.width && tempY < this.grid.height)){
-                    this.grid.cellRegister[`${tempX}, ${tempY}`].explore()
-                    // If clause to prevent the recursive call to be exploring the same cells infinitely
-                    // by adding the cells explored to a class variable and preventing the function to reexploring them.
-                    if(this.grid.cellRegister[`${tempX}, ${tempY}`].mineCount === 0 && 
-                    !(Cell.cellsExplored[`${tempX}, ${tempY}`]===true)){
-                        Cell.cellsExplored[`${tempX}, ${tempY}`] = true;
-                        this.grid.cellRegister[`${tempX}, ${tempY}`].exploreAround()
+        // Function for exploring all the cells containing no mines around surronding this cell.
+        
+        // First check that the required number of adjacents cell have been marked with mines
+        // if not do not allow exploreAround
+        var tempMarker = 0;
+            for(let y1 = -1; y1 < 2; y1+=1){
+                for(let x1 = -1; x1 < 2; x1+=1){
+                    var tempX1 = this.xPos+x1;
+                    var tempY1 = this.yPos+y1;
+                    
+                    if((x1 !== 0 || y1 !== 0)&&(tempX1 >= 0 && tempY1 >= 0) && 
+                    (tempX1 < this.grid.width && tempY1 < this.grid.height)){
+                        
+                        if(this.grid.cellReg[`${tempX1}, ${tempY1}`].marked === true){
+                            tempMarker +=1;
+                            console.log(tempMarker)
+                        }
+                    }
+                }
+            }  
+        if(tempMarker === this.mineCount){
+            for(let y = -1; y < 2; y+=1){
+                // For loops to explore the 8 adjacents cells.
+                for(let x = -1; x < 2; x+=1){
+                    var tempX = this.xPos+x;
+                    var tempY = this.yPos+y;
+                    // If clause to prevent the cell from exploring itself and/or outside the grid.
+                    if((x !== 0 || y !== 0)&&(tempX >= 0 && tempY >= 0) && 
+                    (tempX < this.grid.width && tempY < this.grid.height)){
+                        // Base case
+                        this.grid.cellReg[`${tempX}, ${tempY}`].explore()
+                        // If clause to prevent the recursive call to be exploring the same cells infinitely
+                        // by adding the cells explored to a class variable and preventing the function to reexploring them.
+                        if(this.grid.cellReg[`${tempX}, ${tempY}`].mineCount === 0 && 
+                        !(Cell.cellsExplored[`${tempX}, ${tempY}`]===true)){
+                            Cell.cellsExplored[`${tempX}, ${tempY}`] = true;
+                            // Recursive call
+                            this.grid.cellReg[`${tempX}, ${tempY}`].exploreAround()
+                        }
                     }
                 }
             }
         }
     }
+    
     checkWin = () =>{
         if(Cell.cellsRevealed === this.grid.goal){
             // logic gor ending the game winning
@@ -127,8 +136,8 @@ class Cell{
         // Reveal all mines
         for(var y = 0; y < this.grid.height; y +=1){
             for(var x = 0; x < this.grid.width; x +=1){
-                if(this.grid.cellRegister[`${x}, ${y}`].getMine=== true){
-                    this.grid.cellRegister[`${x}, ${y}`].div.style.backgroundColor = "red";
+                if(this.grid.cellReg[`${x}, ${y}`].getMine=== true){
+                    this.grid.cellReg[`${x}, ${y}`].div.style.backgroundColor = "red";
                 }
             }
         }
@@ -140,7 +149,7 @@ class Grid{
         this.width = width;
         this.height = height;
         this.numMines = numMines;
-        this.cellRegister = new Object();
+        this.cellReg = {};
         this.squaresArray = [];
         this.minesArray = [];
         this.goal = this.width * this.height - this.numMines
@@ -188,9 +197,9 @@ class Grid{
         // For loop to assining mines to the corresponding cells.
         for(let y = 0; y < this.height; y++){
             for(let x = 0; x < this.width; x++){
-                this.cellRegister[`${x}, ${y}`] = new Cell(x, y, this.grid)
+                this.cellReg[`${x}, ${y}`] = new Cell(x, y, this.grid)
                 if(counter === this.minesArray[0]){
-                    this.cellRegister[`${x}, ${y}`].setMine = true;
+                    this.cellReg[`${x}, ${y}`].setMine = true;
                     counter +=1;
                     this.minesArray.shift()
                 }else{
@@ -226,33 +235,18 @@ createButtons = () =>{
     header.insertAdjacentElement("beforeend", hard);
 }
 logClick = (e) =>{
-    // First try to make target work
-    // Not working at the moment
-    // Can't pass the grid name to the dataset to be later retrieved and use
-    // in accesing to the cellRegister
+    // Function to know where the user clicks and call functions acordingly
     const element = e.target
-    console.log(`element = ${element}`) 
-    console.log(`element data set = ${element.dataset.cellName}`)
-    console.log(`grid = ${element.dataset.grid}`)
-    console.log(Cell.cells[`${element.dataset.cellName}`])
-    
-    // console.log(`${element.dataset.grid}.cellRegister[${element.dataset.cellName}]`.getMine())
-    
-//     console.log(`e.target.className = ${element.className}`)
-//     console.log(`e.buttons = ${e.buttons}`)
     if(e.buttons === 1 && element.className ==="square"){
-        // Aquí hay que pasar la entrada del diccionario cell
-        Cell.cells[`${element.dataset.cellName}`].explore();
+        Cell.cellRegister[`${element.dataset.cellName}`].explore();
     }
     else if(e.buttons === 2 && e.target.className ==="square"){ 
-        Cell.cells[`${element.dataset.cellName}`].mark(); 
+        Cell.cellRegister[`${element.dataset.cellName}`].mark(); 
     }
     else if(e.buttons === 3 && e.target.className ==="square"){
-        Cell.cells[`${element.dataset.cellName}`].exploreAround()   
+        Cell.cellRegister[`${element.dataset.cellName}`].exploreAround()   
     }
-// }
-
-    }
+}
 startGame = (width, height, mines) =>{
     var field = new Grid(width, height, mines);
     field.addGrid(field);
@@ -284,7 +278,5 @@ window.onload = function init(){
 
 createButtons()
 document.addEventListener("mousedown", event => logClick(event))
-//     const 
-// })
 
 }
