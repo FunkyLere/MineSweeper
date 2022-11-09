@@ -1,3 +1,7 @@
+// CHECK ON CELLREGISTER AND CELLREG
+// CUT OUT ONE OF THESE
+
+
 class Cell{
     // Variable that given some coordinates in the grid points
     // to the cell instance. Fundamental to use target()
@@ -20,9 +24,9 @@ class Cell{
         this.container.insertAdjacentElement("beforeend", this.div);
         this.div.style.left = `${this.xPos*27}px`;
         this.div.style.top = `${this.yPos*27}px`;
-        this.div.dataset.cellName = `${this.xPos} ,${this.yPos}`;
+        this.div.dataset.cellName = `${this.xPos}, ${this.yPos}`;
         //Add the instance of cell to the cells object 
-        Cell.cellRegister[`${this.xPos} ,${this.yPos}`] = this;
+        // Cell.cellRegister[`${this.xPos} ,${this.yPos}`] = this;
     }
     get getMine(){
         return this.mine;
@@ -124,7 +128,11 @@ class Cell{
     checkWin = () =>{
         if(Cell.cellsRevealed === this.grid.goal){
             // logic gor ending the game winning
-            alert("The field is clear, you won!");
+            // alert("The field is clear, you won!");
+            this.container.innerHTML = "";
+            var winMessage = document.createElement("h1");
+            winMessage.innerText = "You win";
+            this.container.insertAdjacentElement("beforeend", winMessage);
         }
     }
     lose = () =>{
@@ -137,18 +145,26 @@ class Cell{
                 }
             }
         }
-        // alert("You lost");
+        const keys = Object.keys(Grid.cellRegister);
+        var mesY = Grid.cellRegister[keys[keys.length-1]].yPos;
+        var loseMessage = document.createElement("h1");
+        // var messageDiv = document.createElement("div");
+        // messageDiv.insertAdjacentElement("beforeend", loseMessage)
+        console.log(mesY)
+        loseMessage.innerText = "You lose";
+        this.container.insertAdjacentElement("beforeend", loseMessage);
+        loseMessage.style.marginTop = `${mesY*27+40}px`;
+        Grid.gameOver = true;
     }
 }
 class Grid{
+    static cellRegister = {};
+    static gameOver = false;
     constructor(width, height, numMines, container){
         this.width = width;
         this.height = height;
         this.numMines = numMines;
         this.container = container;
-        this.cellReg = {};
-    
-
         this.squaresArray = [];
         this.minesArray = [];
         this.goal = this.width * this.height - this.numMines;
@@ -196,9 +212,9 @@ class Grid{
         // For loop to assining mines to the corresponding cells.
         for(let y = 0; y < this.height; y++){
             for(let x = 0; x < this.width; x++){
-                this.cellReg[`${x}, ${y}`] = new Cell(x, y, this.grid, this.container);
+                Grid.cellRegister[`${x}, ${y}`] = new Cell(x, y, this.grid, this.container);
                 if(counter === this.minesArray[0]){
-                    this.cellReg[`${x}, ${y}`].setMine = true;
+                    Grid.cellRegister[`${x}, ${y}`].setMine = true;
                     counter +=1;
                     this.minesArray.shift();
                 }else{
@@ -225,17 +241,20 @@ class StartButton{
         header.insertAdjacentElement("beforeend", this.button);
     }
 }
-logClick = (e) =>{
+function logClick(e){
     // Function to know where the user clicks and call functions acordingly
     const element = e.target;
-    if(e.buttons === 1){
-        Cell.cellRegister[`${element.dataset.cellName}`].explore();
+    console.log(Grid.cellRegister);
+    console.log(element.dataset.cellName);
+    console.log(Grid.cellRegister[element.dataset.cellName]);
+    if(e.buttons === 1 && Grid.gameOver === false){
+        Grid.cellRegister[`${element.dataset.cellName}`].explore();
     }
-    else if(e.buttons === 2){ 
-        Cell.cellRegister[`${element.dataset.cellName}`].mark(); 
+    else if(e.buttons === 2 && Grid.gameOver === false){ 
+        Grid.cellRegister[`${element.dataset.cellName}`].mark(); 
     }
-    else if(e.buttons === 3){
-        Cell.cellRegister[`${element.dataset.cellName}`].exploreAround();  
+    else if(e.buttons === 3 && Grid.gameOver === false){
+        Grid.cellRegister[`${element.dataset.cellName}`].exploreAround();  
     }
 }
 function newGame(width, height, mines, container){
@@ -248,15 +267,17 @@ function resetGame(){
     // Remove all the div and create buttons again
     document.querySelector("#container").innerHTML = "";
     // Reset Cell.cellRevealed and Cell.cellExplored.
+    Grid.cellRegister = {};
     Cell.cellsExplored = {};
     Cell.cellsRevealed = 0;
+    Grid.gameOver = false;
 }
 window.onload = function init(){
 
-    const container = document.querySelector("#container");
     document.addEventListener("mousedown", event => logClick(event));
-    var easy = new StartButton("easy", 8, 8, 8, container);
+    const container = document.querySelector("#container");
+    
+    var easy = new StartButton("easy", 8, 8, 6, container);
     var medium = new StartButton("medium", 14, 10, 26, container);
     var hard = new StartButton("hard", 18, 12, 48, container);
-
 }
