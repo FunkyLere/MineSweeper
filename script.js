@@ -1,15 +1,5 @@
-// CHECK ON CELLREGISTER AND CELLREG
-// CUT OUT ONE OF THESE
-
-
 class Cell{
-    // Variable that given some coordinates in the grid points
-    // to the cell instance. Fundamental to use target()
-    static cellRegister = {};
-    static cellsRevealed = 0;
-    static colors = {1: "blue", 2: "green", 3: "yellow", 4: "#0800A1", 5:"#DB0066", 6:"#30B0B3", 7:"purple", 8:"grey"};
-    static cellsExplored = {};
-    constructor(xPos, yPos, grid){
+    constructor(xPos, yPos, grid, container){
         this.xPos = xPos;
         this.yPos = yPos;
         this.grid = grid;
@@ -25,8 +15,6 @@ class Cell{
         this.div.style.left = `${this.xPos*27}px`;
         this.div.style.top = `${this.yPos*27}px`;
         this.div.dataset.cellName = `${this.xPos}, ${this.yPos}`;
-        //Add the instance of cell to the cells object 
-        // Cell.cellRegister[`${this.xPos} ,${this.yPos}`] = this;
     }
     get getMine(){
         return this.mine;
@@ -38,11 +26,11 @@ class Cell{
         if(this.marked === false){
             if(this.getMine === true){
                 this.div.style.backgroundColor = "red";
-                this.lose();
+                this.grid.lose();
             }else{
                 if(this.mineCount === false){
                     this.div.style.backgroundColor = "#D9D9D9";
-                    Cell.cellsRevealed += 1;
+                    Grid.cellsRevealed += 1;
                     this.mineCount = 0;
                     // For loops to explore the cells in the range -1/+1 of the cell
                     // in the x and y axis.
@@ -54,7 +42,7 @@ class Cell{
                                 var tempY = this.yPos+y;
                                 // Clause to not explore cells outside the grid
                                 if((tempX >= 0 && tempY >= 0)&&(tempX < this.grid.width && tempY < this.grid.height)){
-                                    var temp = this.grid.cellReg[`${tempX}, ${tempY}`];
+                                    var temp = Grid.cellRegister[`${tempX}, ${tempY}`];
                                     if(temp.getMine === true){
                                         this.mineCount += 1;
                                     }
@@ -64,14 +52,14 @@ class Cell{
                     }
                     if(this.mineCount > 0){
                         this.div.innerText = `${this.mineCount}`;
-                        this.div.style.color = Cell.colors[`${this.mineCount}`];
+                        this.div.style.color = Grid.colors[`${this.mineCount}`];
                     }else{
                         this.exploreAround();
                     }
                 }
             }    
         }
-        this.checkWin();
+        this.grid.checkWin();
     }
     mark = () =>{
         if(this.marked === false && this.mineCount === false){
@@ -94,7 +82,7 @@ class Cell{
                     var tempY1 = this.yPos+y1;  
                     if((x1 !== 0 || y1 !== 0)&&(tempX1 >= 0 && tempY1 >= 0) && 
                     (tempX1 < this.grid.width && tempY1 < this.grid.height)){
-                        if(this.grid.cellReg[`${tempX1}, ${tempY1}`].marked === true){
+                        if(Grid.cellRegister[`${tempX1}, ${tempY1}`].marked === true){
                             tempMarker +=1;
                         }
                     }
@@ -110,55 +98,26 @@ class Cell{
                     if((x !== 0 || y !== 0)&&(tempX >= 0 && tempY >= 0) && 
                     (tempX < this.grid.width && tempY < this.grid.height)){
                         // Base case
-                        this.grid.cellReg[`${tempX}, ${tempY}`].explore();
+                        Grid.cellRegister[`${tempX}, ${tempY}`].explore();
                         // If clause to prevent the recursive call to be exploring the same cells infinitely
                         // by adding the cells explored to a class variable and preventing the function to reexploring them.
-                        if(this.grid.cellReg[`${tempX}, ${tempY}`].mineCount === 0 && 
-                        !(Cell.cellsExplored[`${tempX}, ${tempY}`]===true)){
-                            Cell.cellsExplored[`${tempX}, ${tempY}`] = true;
+                        if(Grid.cellRegister[`${tempX}, ${tempY}`].mineCount === 0 && 
+                        !(Grid.cellsExplored[`${tempX}, ${tempY}`]===true)){
+                            Grid.cellsExplored[`${tempX}, ${tempY}`] = true;
                             // Recursive call
-                            this.grid.cellReg[`${tempX}, ${tempY}`].exploreAround();
+                            Grid.cellRegister[`${tempX}, ${tempY}`].exploreAround();
                         }
                     }
                 }
             }
         }
     }
-    
-    checkWin = () =>{
-        if(Cell.cellsRevealed === this.grid.goal){
-            // logic gor ending the game winning
-            // alert("The field is clear, you won!");
-            this.container.innerHTML = "";
-            var winMessage = document.createElement("h1");
-            winMessage.innerText = "You win";
-            this.container.insertAdjacentElement("beforeend", winMessage);
-        }
-    }
-    lose = () =>{
-        // Logic for ending the game losing
-        // Reveal all mines
-        for(var y = 0; y < this.grid.height; y +=1){
-            for(var x = 0; x < this.grid.width; x +=1){
-                if(this.grid.cellReg[`${x}, ${y}`].getMine=== true){
-                    this.grid.cellReg[`${x}, ${y}`].div.style.backgroundColor = "red";
-                }
-            }
-        }
-        const keys = Object.keys(Grid.cellRegister);
-        var mesY = Grid.cellRegister[keys[keys.length-1]].yPos;
-        var loseMessage = document.createElement("h1");
-        // var messageDiv = document.createElement("div");
-        // messageDiv.insertAdjacentElement("beforeend", loseMessage)
-        console.log(mesY)
-        loseMessage.innerText = "You lose";
-        this.container.insertAdjacentElement("beforeend", loseMessage);
-        loseMessage.style.marginTop = `${mesY*27+40}px`;
-        Grid.gameOver = true;
-    }
 }
 class Grid{
     static cellRegister = {};
+    static cellsRevealed = 0;
+    static colors = {1: "blue", 2: "green", 3: "yellow", 4: "#0800A1", 5:"#DB0066", 6:"#30B0B3", 7:"purple", 8:"grey"};
+    static cellsExplored = {};
     static gameOver = false;
     constructor(width, height, numMines, container){
         this.width = width;
@@ -223,6 +182,36 @@ class Grid{
             }
         }
     }
+    checkWin = () =>{
+        if(Grid.cellsRevealed === this.goal){
+            // logic gor ending the game winning
+            // alert("The field is clear, you won!");
+            this.container.innerHTML = "";
+            var winMessage = document.createElement("h1");
+            winMessage.innerText = "You win";
+            this.container.insertAdjacentElement("beforeend", winMessage);
+        }
+    }
+    lose = () =>{
+        // Logic for ending the game losing
+        // Reveal all mines
+        for(var y = 0; y < this.height; y +=1){
+            for(var x = 0; x < this.width; x +=1){
+                if(Grid.cellRegister[`${x}, ${y}`].getMine=== true){
+                    Grid.cellRegister[`${x}, ${y}`].div.style.backgroundColor = "red";
+                }
+            }
+        }
+        const keys = Object.keys(Grid.cellRegister);
+        var mesY = Grid.cellRegister[keys[keys.length-1]].yPos;
+        var loseMessage = document.createElement("h1");
+        // var messageDiv = document.createElement("div");
+        // messageDiv.insertAdjacentElement("beforeend", loseMessage)
+        loseMessage.innerText = "You lose";
+        this.container.insertAdjacentElement("beforeend", loseMessage);
+        loseMessage.style.marginTop = `${mesY*27+40}px`;
+        Grid.gameOver = true;
+    }
 }
 class StartButton{
     constructor(name, width, height, mines, container){
@@ -234,18 +223,24 @@ class StartButton{
         this.button = document.createElement("button");
         this.button.innerText = name.charAt(0).toUpperCase() + name.slice(1);
         this.button.onclick = () =>{
-            resetGame(StartButton.list);
+            resetGame();
             newGame(this.width, this.height, this.mines, this.container);
+            var start = Date.now();
+            var timer = document.createElement("h4");
+            container.insertAdjacentElement("afterbegin", timer);
+            timer.innerText = 0;
+            setInterval(function (){
+                timer.innerText = Math.floor((Date.now()-start)/1000);
+            }, 1000);   
         }
         const header = document.querySelector("header");
         header.insertAdjacentElement("beforeend", this.button);
+        
     }
 }
 function logClick(e){
     // Function to know where the user clicks and call functions acordingly
     const element = e.target;
-    console.log(Grid.cellRegister);
-    console.log(element.dataset.cellName);
     console.log(Grid.cellRegister[element.dataset.cellName]);
     if(e.buttons === 1 && Grid.gameOver === false){
         Grid.cellRegister[`${element.dataset.cellName}`].explore();
@@ -266,11 +261,20 @@ function newGame(width, height, mines, container){
 function resetGame(){
     // Remove all the div and create buttons again
     document.querySelector("#container").innerHTML = "";
-    // Reset Cell.cellRevealed and Cell.cellExplored.
+    // Reset class variables.
     Grid.cellRegister = {};
-    Cell.cellsExplored = {};
-    Cell.cellsRevealed = 0;
+    Grid.cellsExplored = {};
+    Grid.cellsRevealed = 0;
     Grid.gameOver = false;
+}
+function timer(){
+    var start = Date.now();
+    var now = setInterval(function (){
+        Date.now()-start;
+        output(Math.floor(time/1000));
+}, 1000);
+    
+
 }
 window.onload = function init(){
 
