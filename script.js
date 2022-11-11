@@ -134,7 +134,8 @@ class Grid{
     static colors = {1: "blue", 2: "green", 3: "yellow", 4: "#0800A1", 5:"#DB0066", 6:"#30B0B3", 7:"purple", 8:"grey"};
     static cellsExplored = {};
     static gameOver = false;
-    constructor(width, height, numMines, container){
+    constructor(name, width, height, numMines, container){
+        this.name = name;
         this.width = width;
         this.height = height;
         this.numMines = numMines;
@@ -144,6 +145,7 @@ class Grid{
         this.goal = this.width * this.height - this.numMines;
         this.timer = new Timer(this.container);
         this.timer.startTimer();
+        this.grid = this;
     }
     get getNumMines(){
         return this.numMines;
@@ -160,9 +162,9 @@ class Grid{
     set setMinesArray(array){
         this.minesArray = array;
     }
-    addGrid = (grid) => {
-        this.grid = grid;
-    }
+    // addGrid = (grid) => {
+    //     this.grid = grid;
+    // }
     // Function necesary for sorting numerics arrays.
     compareNumbers = (a,b) =>{
         return a - b;
@@ -204,8 +206,13 @@ class Grid{
             this.time = this.timer.stopTimer();
             this.container.innerHTML = "";
             var winMessage = document.createElement("h1");
-            winMessage.innerText = `You win and your time is ${this.time}`;
+            winMessage.innerText = `You win and your best time is ${localStorage.getItem(`${this.name}`)}`;
             this.container.insertAdjacentElement("beforeend", winMessage);     
+        }
+        if(!localStorage.getItem(`${this.name}`)){
+            localStorage.setItem(`${this.name}`, this.time);
+        }else if(localStorage.getItem(`${this.name}`) > this.time){
+            localStorage.setItem(`${this.name}`, this.time);
         }
     }
     lose = () =>{
@@ -240,7 +247,7 @@ class StartButton{
         this.button.innerText = name.charAt(0).toUpperCase() + name.slice(1);
         this.button.onclick = () =>{
             resetGame();
-            newGame(this.width, this.height, this.mines, this.container);
+            newGame(this.name, this.width, this.height, this.mines, this.container);
         }
         const header = document.querySelector("header");
         header.insertAdjacentElement("beforeend", this.button);       
@@ -282,10 +289,10 @@ function logClick(e){
         Grid.cellRegister[`${element.dataset.cellName}`].exploreAround();  
     }}
 }
-function newGame(width, height, mines, container){
+function newGame(name, width, height, mines, container){
     // Wrap up function to start the game.
-    var field = new Grid(width, height, mines, container);    
-    field.addGrid(field);
+    var field = new Grid(name, width, height, mines, container);    
+    // field.addGrid(field);
     field.seedMines();
     field.drawGrid();
 }
@@ -308,7 +315,7 @@ window.onload = function init(){
       }, false);
     const container = document.querySelector("#container");
     
-    var easy = new StartButton("easy", 8, 8, 6, container);
+    var easy = new StartButton("easy", 8, 8, 2, container);
     var medium = new StartButton("medium", 14, 10, 26, container);
     var hard = new StartButton("hard", 18, 12, 48, container);
 }
