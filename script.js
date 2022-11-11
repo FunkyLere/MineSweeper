@@ -270,15 +270,17 @@ class Timer{
 function logClick(e){
     // Function to know where the user clicks and call functions acordingly.
     const element = e.target;
+    if(e.buttons){
     if(e.buttons === 1 && Grid.gameOver === false){
         Grid.cellRegister[`${element.dataset.cellName}`].explore();
     }
     else if(e.buttons === 2 && Grid.gameOver === false){ 
+        
         Grid.cellRegister[`${element.dataset.cellName}`].mark(); 
     }
     else if(e.buttons === 3 && Grid.gameOver === false){
         Grid.cellRegister[`${element.dataset.cellName}`].exploreAround();  
-    }
+    }}
 }
 function newGame(width, height, mines, container){
     // Wrap up function to start the game.
@@ -300,6 +302,10 @@ function resetGame(){
 window.onload = function init(){
 
     document.addEventListener("mousedown", event => logClick(event));
+    // Disabling the call to the right click menu
+    window.addEventListener('contextmenu', function (e) {  
+        e.preventDefault(); 
+      }, false);
     const container = document.querySelector("#container");
     
     var easy = new StartButton("easy", 8, 8, 6, container);
