@@ -1,15 +1,17 @@
 class Cell{
+    // A class to represent each square in the game's grid
+    // and method to interac with them.
     constructor(xPos, yPos, grid, container){
         this.xPos = xPos;
         this.yPos = yPos;
         this.grid = grid;
         this.container = container;
-        // Square states: mines, marked, (explored) replaced by mineCount
+        // Square states: mines, marked and mineCount(explored).
         this.mine = false;
         this.marked = false;
         this.mineCount = false;
         this.mineChecker = 0;
-        // Div creation and insertion in the DOM
+        // Div creation and insertion in the DOM.
         this.div = document.createElement("div");
         this.container.insertAdjacentElement("beforeend", this.div);
         this.div.style.left = `${this.xPos*27}px`;
@@ -23,10 +25,13 @@ class Cell{
         this.mine = boolean;
     }
     explore = () =>{
+        // This method reveals what it is in the square.
         if(this.marked === false){
+            // If there's a mine the game is over.
             if(this.getMine === true){
                 this.div.style.backgroundColor = "red";
-                this.grid.lose();
+                this.grid.lose(); 
+            // Else a number with the square's adjacents mines is revealed.
             }else{
                 if(this.mineCount === false){
                     this.div.style.backgroundColor = "#D9D9D9";
@@ -50,6 +55,9 @@ class Cell{
                             }
                         }
                     }
+                    // If there's no adjacent mines the method keep exploring 
+                    // until finds cells with adjacent mines 
+                    // or all the cells that do not are revealed.
                     if(this.mineCount > 0){
                         this.div.innerText = `${this.mineCount}`;
                         this.div.style.color = Grid.colors[`${this.mineCount}`];
@@ -62,9 +70,12 @@ class Cell{
         this.grid.checkWin();
     }
     mark = () =>{
+        // This method flags a square as mined square,
+        // therefore is prevented by being explored.
         if(this.marked === false && this.mineCount === false){
             this.div.style.backgroundColor = "orange";
             this.marked = true;
+        // Clause to remove the flag.
         }else if(this.mineCount === false){
             this.div.style.backgroundColor = "grey";
             this.marked = false;
@@ -114,6 +125,10 @@ class Cell{
     }
 }
 class Grid{
+    // Class to define the size and number of mines in the game,
+    // draw the grid, 
+    // keep track of the game status: win conditions, timer;
+    // and to call win and lose methods.
     static cellRegister = {};
     static cellsRevealed = 0;
     static colors = {1: "blue", 2: "green", 3: "yellow", 4: "#0800A1", 5:"#DB0066", 6:"#30B0B3", 7:"purple", 8:"grey"};
@@ -127,6 +142,8 @@ class Grid{
         this.squaresArray = [];
         this.minesArray = [];
         this.goal = this.width * this.height - this.numMines;
+        this.timer = new Timer(this.container);
+        this.timer.startTimer();
     }
     get getNumMines(){
         return this.numMines;
@@ -146,7 +163,7 @@ class Grid{
     addGrid = (grid) => {
         this.grid = grid;
     }
-    // Function necesary for sorting numerics arrays
+    // Function necesary for sorting numerics arrays.
     compareNumbers = (a,b) =>{
         return a - b;
     }
@@ -184,12 +201,11 @@ class Grid{
     }
     checkWin = () =>{
         if(Grid.cellsRevealed === this.goal){
-            // logic gor ending the game winning
-            // alert("The field is clear, you won!");
+            this.time = this.timer.stopTimer();
             this.container.innerHTML = "";
             var winMessage = document.createElement("h1");
-            winMessage.innerText = "You win";
-            this.container.insertAdjacentElement("beforeend", winMessage);
+            winMessage.innerText = `You win and your time is ${this.time}`;
+            this.container.insertAdjacentElement("beforeend", winMessage);     
         }
     }
     lose = () =>{
@@ -205,15 +221,15 @@ class Grid{
         const keys = Object.keys(Grid.cellRegister);
         var mesY = Grid.cellRegister[keys[keys.length-1]].yPos;
         var loseMessage = document.createElement("h1");
-        // var messageDiv = document.createElement("div");
-        // messageDiv.insertAdjacentElement("beforeend", loseMessage)
         loseMessage.innerText = "You lose";
         this.container.insertAdjacentElement("beforeend", loseMessage);
         loseMessage.style.marginTop = `${mesY*27+40}px`;
         Grid.gameOver = true;
+        this.timer.stopTimer();
     }
 }
 class StartButton{
+    // Class to create the buttons for starting the game.
     constructor(name, width, height, mines, container){
         this.name = name;
         this.width = width;
@@ -225,23 +241,35 @@ class StartButton{
         this.button.onclick = () =>{
             resetGame();
             newGame(this.width, this.height, this.mines, this.container);
-            var start = Date.now();
-            var timer = document.createElement("h4");
-            container.insertAdjacentElement("afterbegin", timer);
-            timer.innerText = 0;
-            setInterval(function (){
-                timer.innerText = Math.floor((Date.now()-start)/1000);
-            }, 1000);   
         }
         const header = document.querySelector("header");
-        header.insertAdjacentElement("beforeend", this.button);
-        
+        header.insertAdjacentElement("beforeend", this.button);       
+    }
+}
+class Timer{
+    // Class to keep track of the time used to finish the game.
+    constructor(container){
+        this.container = container;
+        this.start = 0;
+        this.timer = document.createElement("h4");
+        container.insertAdjacentElement("afterbegin", this.timer);
+        this.timer.innerText = 0;
+    }
+    startTimer(){
+        this.start = Date.now();
+        this.intervalID = setInterval(()=>{    
+            this.timer.innerText = Math.floor((Date.now()-this.start)/1000);
+        }, 1000);
+    }
+    stopTimer(){
+        this.time = this.timer.innerText;
+        clearInterval(this.intervalID);
+        return this.time;
     }
 }
 function logClick(e){
-    // Function to know where the user clicks and call functions acordingly
+    // Function to know where the user clicks and call functions acordingly.
     const element = e.target;
-    console.log(Grid.cellRegister[element.dataset.cellName]);
     if(e.buttons === 1 && Grid.gameOver === false){
         Grid.cellRegister[`${element.dataset.cellName}`].explore();
     }
@@ -253,12 +281,14 @@ function logClick(e){
     }
 }
 function newGame(width, height, mines, container){
+    // Wrap up function to start the game.
     var field = new Grid(width, height, mines, container);    
     field.addGrid(field);
     field.seedMines();
     field.drawGrid();
 }
 function resetGame(){
+    // Wrap up function to reset the game.
     // Remove all the div and create buttons again
     document.querySelector("#container").innerHTML = "";
     // Reset class variables.
@@ -266,15 +296,6 @@ function resetGame(){
     Grid.cellsExplored = {};
     Grid.cellsRevealed = 0;
     Grid.gameOver = false;
-}
-function timer(){
-    var start = Date.now();
-    var now = setInterval(function (){
-        Date.now()-start;
-        output(Math.floor(time/1000));
-}, 1000);
-    
-
 }
 window.onload = function init(){
 
